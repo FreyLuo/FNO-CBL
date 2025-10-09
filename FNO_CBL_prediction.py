@@ -149,7 +149,7 @@ class FNO4d(nn.Module):
     
 device = torch.device("cuda")
 #**************************************************************************
-#-----------------------------------修改
+#-----------------------------------
 var = [0, 1, 2, 3, 4]
 nvar = len(var)
 time_dstep = 1 
@@ -162,16 +162,14 @@ Nx = 32
 Ny = 32
 Nz = 32
 
-
-nt_in = 1  # 5 for FNOI5O1, 1 for FNOI1O1
-
-casen = 10 
+nt_in = 5  # 5 for FNOI5O1, 1 for FNOI1O1
 ##### For Q_s = 0.24, 
 case_indices = [0, 1, 2, 3,4]
 ##### For Q_s = 0.20, 0.15, 0.25, 0.12, 0.28
-case_indices = [0, 1, 2, 3,4,5, 6, 7, 8,9]
+case_indices = [5, 6, 7, 8,9]
 
-file_path = f'/mnt/Workspace_I/freyluo/datafilter/data_cbl_fLES.npy'
+casen = len(case_indices)
+file_path = f'/.../data_cbl_fLES.npy'
 
 
 print("Loading data from:", file_path)
@@ -184,7 +182,7 @@ print(f" Nx: {Nx}, Ny: {Ny}, Nz: {Nz}")
 # load data
 vor_data_all = np.load(file_path)   
 print("Original data shape:", vor_data_all .shape)    # [5, 73, 32, 32, 32, 5] 
-#### data.shape[0] = 5: different surface heat fluxes Q_s
+#### data.shape[0] = casen: different surface heat fluxes Q_s
 #### data.shape[1] = 73 : 73 time slices.  
 #### data.shape[2],data.shape[3],data.shape[4] = 32 : NX, NY, NZ
 #### data.shape[5] = 5 : potential temperature $\theta$, three velocity components $u_i$, exponential heat fluxes $Q$
@@ -246,7 +244,7 @@ for t_be, timenumber_be in enumerate(timenumber_bes):
                         elif nt_in == 1:  
                             #print(f"pre_vor_t: {predict_vor.shape}")
                             #print(f" {predict_vor[0,0,0:32:8,:]}")  
-                            vor_new = torch.cat((input_vor[:,:,:,:,1:],predict_vor.unsqueeze(-1)),dim=-1) #拼接成新的input
+                            vor_new = torch.cat((input_vor[:,:,:,:,1:],predict_vor.unsqueeze(-1)),dim=-1) 
                             input_vor = vor_new
                         #print(i)
                         #print(f"input_vor: {input_vor.shape}")
@@ -278,7 +276,7 @@ for t_be, timenumber_be in enumerate(timenumber_bes):
             numpy_pre_vor_t_total = pre_vor_t_total.detach().cpu().numpy() 
             print(f"numpy_pre_vor_t_total: {numpy_pre_vor_t_total.shape}")
 
-            file_path = '../pre_t{}/predicted_data_epochs{}.npy'.format(timenumber_be, step_out)
+            file_path = 'predicted_data_epochs{}.npy'.format(timenumber_be, step_out)
             
             if not os.path.exists(file_path):
                 directory = os.path.dirname(file_path)
