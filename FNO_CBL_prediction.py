@@ -161,27 +161,30 @@ width = 96
 Nx = 32
 Ny = 32
 Nz = 32
-
-nt_in = 5  # 5 for FNOI5O1, 1 for FNOI1O1
-##### For Q_s = 0.24, 
-case_indices = [0, 1, 2, 3,4]
-##### For Q_s = 0.20, 0.15, 0.25, 0.12, 0.28
-case_indices = [5, 6, 7, 8,9]
-
-casen = len(case_indices)
-file_path = f'/.../data_cbl_fLES.npy'
-
-
-print("Loading data from:", file_path)
 print(f"  nvar: {nvar}, nt_in: {nt_in}")
 print(f" time_dstep: {time_dstep}, timenumber_be: {timenumber_bes}, timenumber: {timenumber}")
 print(f" modes: {modes}, modes_z: {modes_z}, width: {width} ")
 print(f" Nx: {Nx}, Ny: {Ny}, Nz: {Nz}")
 
+################################################################################
+nt_in = 5  # 5 for FNOI5O1, 1 for FNOI1O1
+
+base_path = f'/.../'
+
+##### For Q_s = 0.24, 
+case_indices = [0, 1, 2, 3, 4]
+file_path = f'{base_path}/data_cbl_fLES_q1_024.npy'
+##### For Q_s = 0.20, 0.15, 0.25, 0.12, 0.28, 0.1, 0.3
+case_indices = [0, 1, 2, 3, 4, 5, 6]
+file_path = f'{base_path}/data_cbl_fLES_q7.npy'
+print("Loading data from:", file_path)
+
+casen = len(case_indices)
+#################################################################
 ################################################################
 # load data
 vor_data_all = np.load(file_path)   
-print("Original data shape:", vor_data_all .shape)    # [5, 73, 32, 32, 32, 5] 
+print("Original data shape:", vor_data_all .shape)    # [5 / 7, 73, 32, 32, 32, 5] 
 #### data.shape[0] = casen: different surface heat fluxes Q_s
 #### data.shape[1] = 73 : 73 time slices.  
 #### data.shape[2],data.shape[3],data.shape[4] = 32 : NX, NY, NZ
@@ -218,7 +221,7 @@ for t_be, timenumber_be in enumerate(timenumber_bes):
     for step_out in range(30, 31): 
         #if step_out > 19 and (24 <= step_out <= 60 and step_out % 2 == 0 or step_out % 5 == 0):
             print(step_out)
-            PATH = '../model/model_4layer_epochs{}.pth'.format(step_out)
+            PATH = '../model/FNO_model_I{}O1.pth'.format(nt_in)
             model.load_state_dict(torch.load(PATH))  
             model.eval() 
             ###########################################################################
@@ -230,25 +233,16 @@ for t_be, timenumber_be in enumerate(timenumber_bes):
                     time_advanced_step = step_adv  
                     input_vor = vor_data[sample_id,time_id:time_id+nt_in,...].permute(1,2,3,4,0) 
                     label_vor = vor_data[sample_id,time_id+nt_in:time_id+nt_in+time_advanced_step,...].permute(1,2,3,4,0) 
+                    input_vor0 = input_vor#[...,0]  
+                    print(f"nt_in, Size of input_vor0: {nt_in} {input_vor0.size()}")
                     ####################
                     pre_vor_t = input_vor[:,:,:,:,0].unsqueeze(-1)  
                     for i in range(time_advanced_step):  
-                        predict_vor = model(input_vor.unsqueeze(0).to(device)).squeeze().detach().cpu()    
-                        if nt_in == 5:  
-                            pre_vor_t = torch.cat((pre_vor_t, predict_vor.unsqueeze(-1)),dim=-1)  
-                            #print(f"pre_vor_t: {pre_vor_t.shape}")
-                            #print(f" {pre_vor_t[0,0,0,:,:]}")  
-                            vor_new = torch.cat((input_vor[:,:,:,:,1:],predict_vor.unsqueeze(-1)),dim=-1) 
-                            input_vor = vor_new 
-                            input_vor[...,4,4] = input_vor[...,4,0]
-                        elif nt_in == 1:  
-                            #print(f"pre_vor_t: {predict_vor.shape}")
-                            #print(f" {predict_vor[0,0,0:32:8,:]}")  
-                            vor_new = torch.cat((input_vor[:,:,:,:,1:],predict_vor.unsqueeze(-1)),dim=-1) 
-                            input_vor = vor_new
-                        #print(i)
-                        #print(f"input_vor: {input_vor.shape}")
-                        #print(f" {input_vor[0,0,0:32:8,4,:]}") 
+                        predict_vor = model(input_vor.unsqueeze(0).to(device)).squeeze().detach().cpu()  
+                        pre_vor_t = torch.cat((pre_vor_t, predict_vor.unsqueeze(-1)),dim=-1)   
+                        vor_new = torch.cat((input_vor[:,:,:,:,1:],predict_vor.unsqueeze(-1)),dim=-1) 
+                        input_vor = vor_new 
+                        input_vor[...,4,:] = input_vor0[...,4,:]   
                         
                     pre_vor_t = pre_vor_t[:,:,:,:,1:] 
                     pre_vor_t_total = torch.cat((pre_vor_t_total, pre_vor_t.unsqueeze(0)),dim=0)
