@@ -23,7 +23,7 @@ qs = [24,24,24,24,24]  #Q_s = qs / 100
 casen = 2*len(qs) +1 
 cases = list(range(0, casen)) 
 print(casen,cases)
-
+#The data can be found at https://doi.org/10.5281/zenodo.18326720 and at https://doi.org/10.5281/zenodo.18297902.
 
 # input_file_path = f'{base_path}/cm1cbl_les_predata.npy'  
 # data = np.load(input_file_path)
