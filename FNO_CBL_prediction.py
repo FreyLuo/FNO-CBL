@@ -171,6 +171,8 @@ nt_in = 5  # 5 for FNOI5O1, 1 for FNOI1O1
 
 base_path = f'/.../'
 
+#The data can be found at https://doi.org/10.5281/zenodo.18297902.
+
 ##### For Q_s = 0.24, 
 case_indices = [0, 1, 2, 3, 4]
 file_path = f'{base_path}/data_cbl_fLES_q1_024.npy'
