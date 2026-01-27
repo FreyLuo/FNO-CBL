@@ -180,6 +180,8 @@ batch_size = 4
 scheduler_step = 8    
 scheduler_gamma = 0.5  
 
+#The data can be found at https://doi.org/10.5281/zenodo.18297902.
+
 filter_type = "sharp"  #   sharp  gaussian  tophat   downsample
 file_path = f'/.../cbl_q7n70_Qne2_{filter_type}_z32.npy'
 
@@ -310,4 +312,5 @@ for ep in range(epochs+1):
 
 MSE_save=np.dstack((mse_train,mse_test)).squeeze()
 np.savetxt('./loss_4layer.txt',MSE_save,fmt="%16.7f")
+
 # redefine retive error function
