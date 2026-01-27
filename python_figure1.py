@@ -24,7 +24,7 @@ x_max = 25.6
 
 base_path = f'{base_path}'
 
-
+#The data can be found at https://doi.org/10.5281/zenodo.18326720 and at https://doi.org/10.5281/zenodo.18297902.
 input_file_path = f'{base_path}/cm1cbl_les_predata.npy'  
 data = np.load(input_file_path)
 print(f"Loaded data_in shape: {data.shape}") 
