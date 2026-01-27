@@ -24,6 +24,7 @@ casen = 2*len(qs) +1
 cases = list(range(0, casen)) 
 print(casen,cases)
 
+#The data can be found at https://doi.org/10.5281/zenodo.18326720 and at https://doi.org/10.5281/zenodo.18297902.
 input_file_path = f'{base_path}/data_cbl_fLES_q1_024.npy'  
 data = np.load(input_file_path)
 print(f"Loaded data_in shape: {data.shape}") 
